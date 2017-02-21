@@ -10,6 +10,9 @@ Function prototype to call ET solvers:
 void ET_Solver( const real Input[NCOMP_TOTAL][ FLU_NXT*FLU_NXT*FLU_NXT ],
                       real Output[NCOMP_TOTAL][ PS2*PS2*PS2 ],
                 const real dt, const real dh ) {
+  /* compile via:
+   * g++ -DNCOMP_TOTAL=2 -DPS2=8 -DFLU_GHOST_SIZE=5 -DFLU_NXT=18 -Dreal=double -c wavetoy.cc
+   */
   /* a simple wave equation in a first order time, second order space
    * decomposition.
    * for the PDE 0 = (\partial^2_t + \partial^2_x) \phi we introduce a new
@@ -29,18 +32,18 @@ void ET_Solver( const real Input[NCOMP_TOTAL][ FLU_NXT*FLU_NXT*FLU_NXT ],
                             -(1./5.)  *f[idx-2*didx] \
                             +(4./105.)*f[idx-3*didx] \
                             -(1./280.)*f[idx-4*didx])
-  real *phi = Input[0];
-  real *pi = Input[1];
+  const real *phi = Input[0];
+  const real *pi = Input[1];
   real *dtphi = Output[0];
   real *dtpi = Output[1];
-  const ptrdiff_t di = GFINDEX3D_GHOSTED(1,0,0);
-  const ptrdiff_t dj = GFINDEX3D_GHOSTED(0,1,0);
-  const ptrdiff_t dk = GFINDEX3D_GHOSTED(0,0,1);
-  for(ptrdiff_t k = 0 ; k < PS2 ; ++k) {
-    for(ptrdiff_t j = 0 ; j < PS2 ; ++j) {
-      for(ptrdiff_t i = 0 ; i < PS2 ; ++i) {
-        const ptrdiff_t idx_in = GFINDEX3D_GHOSTED(i,j,k)
-        const ptrdiff_t idx_out = GFINDEX3D_NONGHOSTED(i,j,k)
+  const int di = GFINDEX3D_GHOSTED(1,0,0);
+  const int dj = GFINDEX3D_GHOSTED(0,1,0);
+  const int dk = GFINDEX3D_GHOSTED(0,0,1);
+  for(int k = 0 ; k < PS2 ; ++k) {
+    for(int j = 0 ; j < PS2 ; ++j) {
+      for(int i = 0 ; i < PS2 ; ++i) {
+        const int idx_in = GFINDEX3D_GHOSTED(i,j,k);
+        const int idx_out = GFINDEX3D_NONGHOSTED(i,j,k);
         const real phi11 = PD82nd(phi, idx_in,di);
         const real phi22 = PD82nd(phi, idx_in,dj);
         const real phi33 = PD82nd(phi, idx_in,dk);
