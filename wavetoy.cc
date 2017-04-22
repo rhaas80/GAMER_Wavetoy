@@ -7,6 +7,8 @@ Function prototype to call ET solvers:
 5. dh: cell size
 */
 
+#include "grid.h"
+
 void ET_Solver( const real Input[NCOMP_TOTAL][ FLU_NXT*FLU_NXT*FLU_NXT ],
                       real Output[NCOMP_TOTAL][ PS2*PS2*PS2 ],
                 const real dt, const real dh ) {
@@ -28,17 +30,17 @@ void ET_Solver( const real Input[NCOMP_TOTAL][ FLU_NXT*FLU_NXT*FLU_NXT ],
                             -(4./105.)*f[idx-3*didx] \
                             +(1./5.)  *f[idx-2*didx] \
                             -(4./5.)  *f[idx-1*didx] \
-                            +(4./5.)  *f[idx-1*didx] \
-                            -(1./5.)  *f[idx-2*didx] \
-                            +(4./105.)*f[idx-3*didx] \
-                            -(1./280.)*f[idx-4*didx])
+                            +(4./5.)  *f[idx+1*didx] \
+                            -(1./5.)  *f[idx+2*didx] \
+                            +(4./105.)*f[idx+3*didx] \
+                            -(1./280.)*f[idx+4*didx])
   const real *phi = Input[0];
   const real *pi = Input[1];
   real *dtphi = Output[0];
   real *dtpi = Output[1];
-  const int di = GFINDEX3D_GHOSTED(1,0,0);
-  const int dj = GFINDEX3D_GHOSTED(0,1,0);
-  const int dk = GFINDEX3D_GHOSTED(0,0,1);
+  const int di = 1;
+  const int dj = FLU_NXT;
+  const int dk = FLU_NXT*FLU_NXT;
   for(int k = 0 ; k < PS2 ; ++k) {
     for(int j = 0 ; j < PS2 ; ++j) {
       for(int i = 0 ; i < PS2 ; ++i) {
